@@ -16,9 +16,9 @@ public class ImageOnlinePerceptron {
 
     /* Parametres */
     // Na exemples pour l'ensemble d'apprentissage
-    public static final int Na = 20000; 
+    public static final int Na = 1000;
     // Nv exemples pour l'ensemble d'évaluation
-    public static final int Nv = 5000; 
+    public static final int Nv = 500;
     // Nombre d'epoque max
     public final static int EPOCHMAX=20;
     // Classe positive (le reste sera considere comme des ex. negatifs):

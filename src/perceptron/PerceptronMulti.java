@@ -120,7 +120,16 @@ public class PerceptronMulti {
 		}
 		return nbErrors;
 	}
-	
+
+	private float costFunction(float data[][], int [] dataLabels) {
+		float Etotal = 0;
+		for (int imageIndex = 0; imageIndex < data.length; imageIndex += 1) {
+			Etotal += (float) Math.log(probaForPoint(data[imageIndex])[dataLabels[imageIndex]]);
+		}
+		return Etotal/data.length;
+	}
+
+
 	public int[][] learnWithErrorsArray(float data[][], int dataLabels[], float dataTest[][], int dataTestLabels[], float eta, int maxStages) {
 		int [][]dataStickers = new int [dataLabels.length][m_stickersDim];
 		int[][] errors = new int[maxStages][2];
@@ -193,15 +202,6 @@ public class PerceptronMulti {
 		return perceptronRep;
 	}
 	
-	private float costFunction(float data[][], int [] dataLabels) {
-		float Etotal = 0;
-		float[] probas;
-		for (int imageIndex = 0; imageIndex < data.length; imageIndex += 1) {
-			probas[]
-			Etotal += (float) Math.log(dotProd(data[imageIndex],m_perceptronWeightsArray[dataLabels[imageIndex]])));
-		}
-		return Etotal/data.length;
-	}
 
 	
 	

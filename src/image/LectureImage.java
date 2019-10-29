@@ -1,7 +1,9 @@
 package image;
+
+import mnisttools.MnistReader;
+
 import java.util.ArrayList;
 import java.util.List;
-import mnisttools.MnistReader;
 
 public class LectureImage {
 	/**

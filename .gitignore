@@ -1,2 +1,5 @@
 # Project exclude paths
 /bin/
+/train.d
+/val.d
+/blabla/

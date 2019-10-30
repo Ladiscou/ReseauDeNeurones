@@ -6,6 +6,7 @@
 			<attribute name="module" value="true"/>
 		</attributes>
 	</classpathentry>
-	<classpathentry exported="true" kind="var" path="USER_HOME/Téléchargements/mnist-tools.jar" sourcepath="/USER_HOME/Téléchargements/mnist-tools.jar"/>
+	<classpathentry exported="true" kind="var" path="USER_HOME/Téléchargements/mnist-tools.jar"/>
+	<classpathentry kind="con" path="org.eclipse.jdt.USER_LIBRARY/mnist-tools"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>

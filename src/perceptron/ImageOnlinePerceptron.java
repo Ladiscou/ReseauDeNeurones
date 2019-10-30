@@ -8,6 +8,7 @@ import java.util.Random;
 
 public class ImageOnlinePerceptron {
 
+
     /* Les donnees */
     public static String path="src/resources/";
     public static String labelDB=path+"train-labels-idx1-ubyte";
@@ -108,7 +109,7 @@ public class ImageOnlinePerceptron {
             FileWriter fw = new FileWriter(plotName + ".gnu");
             fw.write("set terminal svg size 2000,1000 \nset output 'histogram");
 
-            fw.write(""+eta);
+            fw.write(""+plotName+eta);
             fw.write("Multi.svg'\nset title \"Na = "+Na+" Nv = "+Nv+"\" \n");
             fw.write("set grid\nset style data linespoints\nplot");
             for (int i = 0; i < fileNames.length-1; i+= 1){

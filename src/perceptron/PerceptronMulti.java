@@ -71,7 +71,7 @@ public class PerceptronMulti {
 		float[] probas = probaForPoint(point);
 		for (int perceptronIndex =0; perceptronIndex < m_stickersDim; perceptronIndex+= 1) {
 			for (int weightIndex = 0; weightIndex < m_pointDim; weightIndex+=1) {
-				m_perceptronWeightsArray[perceptronIndex][weightIndex] += eta * point[weightIndex] *(sticker[perceptronIndex]-probas[perceptronIndex]);
+				m_perceptronWeightsArray[perceptronIndex][weightIndex] -= eta * point[weightIndex] *(probas[perceptronIndex] - sticker[perceptronIndex]);
 			}
 		}
 	}
@@ -90,15 +90,11 @@ public class PerceptronMulti {
 	}
 	
 	
-	public int stage(float data[][], int [] dataLabels, int [][] dataStickers, float eta) {
+	public void stage(float data[][], int [] dataLabels, int [][] dataStickers, float eta) {
 		int errorsNb = 0;
     	for (int i = 0; i < data.length; i +=1) {
-    		if (computeClass(data[i]) != dataLabels[i]) {
-    			learnFromPoint( data[i], dataStickers[i],eta);
-    			errorsNb += 1;
-    		}
-    	}
-		return errorsNb;
+			learnFromPoint(data[i], dataStickers[i], eta);
+		}
 	}
 	
 	public void learn(float data[][], int dataLabels[], float eta, int maxStages) {
@@ -130,17 +126,20 @@ public class PerceptronMulti {
 	}
 
 
-	public int[][] learnWithErrorsArray(float data[][], int dataLabels[], float dataTest[][], int dataTestLabels[], float eta, int maxStages) {
+	public int[][] learnWithErrorsArray(float data[][], int dataLabels[], float dataValidation[][], int dataValidationLabels[], float eta, int maxStages) {
 		int [][]dataStickers = new int [dataLabels.length][m_stickersDim];
 		int[][] errors = new int[maxStages][2];
 		
 		for (int i =0; i < dataLabels.length; i += 1) {
 			dataStickers[i] = intToSticker(dataLabels[i]);
 		}
-		for (int stageIndx = 0; stageIndx < maxStages; stageIndx += 1) {
-			errors[stageIndx][0] = this.errorsDataSet(dataTest,dataTestLabels);
-			errors[stageIndx][1] = stage(data,dataLabels,dataStickers,eta);
+		for (int stageIndx = 0; stageIndx < maxStages-1; stageIndx += 1) {
+			stage(data,dataLabels,dataStickers,eta);
+			errors[stageIndx][0] = this.errorsDataSet(dataValidation,dataValidationLabels);
+			errors[stageIndx][1] = this.errorsDataSet(data,dataLabels);
 		}
+		errors[maxStages-1][0] = this.errorsDataSet(dataValidation,dataValidationLabels);
+		errors[maxStages-1][1] = this.errorsDataSet(data,dataLabels);
 		return errors;
 	}
 
@@ -185,6 +184,14 @@ public class PerceptronMulti {
 		return repTab;
 	}
 
+	public String probaForPointString(float point []){
+        return tabToString(probaForPoint(point));
+    }
+
+    public  String oneHotForLabel(int label){
+	    return tabToString(intToSticker(label));
+    }
+
 	@Override
 	public String toString(){
 		String perceptronRep = "......begin..Perceptron[" +m_stickersDim + "x" + m_pointDim +  "]......\n[";
@@ -216,13 +223,13 @@ public class PerceptronMulti {
 		System.out.println(multPerceptron);
 		float point[] = new float[multPerceptron.m_pointDim];
 		point[0] = 1;
-//		point[2] = 2.5f;
+		point[1] = 2.5f;
 		System.out.println("point : "+ tabToString(point));
 		System.out.println("proba classes : " + tabToString(multPerceptron.probaForPoint(point)));
 
 		float proba[] = multPerceptron.probaForPoint(point);
 		
-		int stickerPoint[] = multPerceptron.intToSticker(0);
+		int stickerPoint[] = multPerceptron.intToSticker(2);
 		multPerceptron.learnFromPoint(point,stickerPoint,1);
 		
 		
@@ -230,9 +237,7 @@ public class PerceptronMulti {
 		System.out.println("class : "+ tabToString(stickerPoint));
 		System.out.println("proba classes : " + tabToString(proba));
 		System.out.println(multPerceptron.computeClass(point));
-		
-		
-		// TODO Auto-generated method stub
+
 
 	}
 

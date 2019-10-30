@@ -19,7 +19,7 @@ public class ImageOnlinePerceptron {
     // Nv exemples pour l'ensemble d'évaluation
     public static final int Nv = 500;
     // Nombre d'epoque max
-    public final static int EPOCHMAX=20;
+    public final static int EPOCHMAX=50;
     // Classe positive (le reste sera considere comme des ex. negatifs):
     public static int  classe = 5;
 
@@ -146,8 +146,13 @@ public class ImageOnlinePerceptron {
         System.out.println("# Built validation for digits ");
         
         PerceptronMulti numberTeller = new PerceptronMulti(Dim,10);
-        
-        float eta = 0.0001f;
+        System.out.println(numberTeller.probaForPointString(trainData[2]));
+        System.out.println(numberTeller.oneHotForLabel(refs[2]));
+
+        System.out.println(numberTeller.probaForPointString(trainData[Na/2]));
+        System.out.println(numberTeller.oneHotForLabel(refs[Na/2]));
+
+        float eta = 0.0005f;
         float [][] errorsCurvePlots = numberTeller.learnWithErrorsCostsArray(trainData, refs, valData, refsVal, eta, EPOCHMAX);
         System.out.println("# Perceptron done.");
 
@@ -176,7 +181,12 @@ public class ImageOnlinePerceptron {
 
         gnuplotFileWriter("costs",costsNames,eta);
 
+        System.out.println(numberTeller.probaForPointString(trainData[2]));
+        System.out.println(numberTeller.oneHotForLabel(refs[2]));
 
+        System.out.println(numberTeller.probaForPointString(trainData[Na/2]));
+        System.out.println(numberTeller.oneHotForLabel(refs[Na/2]));
+        System.out.println(numberTeller);
         System.out.println("# Computation done.");
 
     }

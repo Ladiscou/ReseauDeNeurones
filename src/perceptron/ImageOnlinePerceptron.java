@@ -1,11 +1,10 @@
 package perceptron;
 
-import java.io.FileNotFoundException;
+import mnisttools.MnistReader;
+
 import java.io.FileWriter;
 import java.io.IOException;
-import java.io.UnsupportedEncodingException;
 import java.util.Random;
-import mnisttools.MnistReader;
 
 public class ImageOnlinePerceptron {
 
@@ -88,8 +87,40 @@ public class ImageOnlinePerceptron {
     	}
     	return w;
     }
-    
-    
+
+    private static void dataFilesWriter(String[] fileNames, float data[][]) {
+        for (int j = 0; j < fileNames.length; j += 1) {
+            try {
+                FileWriter fw = new FileWriter(fileNames[j]+".d");
+                for (int i = 0; i < data.length; i += 1) {
+                    fw.write("" + data[i][j] + "," + 0 + "\n");
+                }
+                fw.close();
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        }
+    }
+
+
+    private static void gnuplotFileWriter(String plotName,String[] fileNames,float eta){
+        try {
+            FileWriter fw = new FileWriter(plotName + ".gnu");
+            fw.write("set terminal svg size 2000,1000 \nset output 'histogram");
+
+            fw.write(""+eta);
+            fw.write("Multi.svg'\nset title \"Na = "+Na+" Nv = "+Nv+"\" \n");
+            fw.write("set grid\nset style data linespoints\nplot");
+            for (int i = 0; i < fileNames.length-1; i+= 1){
+                fw.write("'"+fileNames[i] + ".d',");
+            }
+            fw.write("'"+fileNames[fileNames.length-1]+".d'\n");
+            fw.close();
+        }
+        catch(IOException e){
+            e.printStackTrace();
+        }
+    }
 
     public static void main(String[] args) {
     	System.out.println("# Load the database !");
@@ -116,96 +147,37 @@ public class ImageOnlinePerceptron {
         
         PerceptronMulti numberTeller = new PerceptronMulti(Dim,10);
         
-        
-        int [][] errorsCurvePlots = numberTeller.learnWithErrorsArray(trainData, refs, valData, refsVal, 0.0001f, EPOCHMAX);
+        float eta = 0.0001f;
+        float [][] errorsCurvePlots = numberTeller.learnWithErrorsCostsArray(trainData, refs, valData, refsVal, eta, EPOCHMAX);
         System.out.println("# Perceptron done.");
 
         System.out.println("Validation accuracy : "+ 100.f * (1.f- (float)(errorsCurvePlots[EPOCHMAX-1][0]) /Nv) +
         					"%, Training accuracy : " + 100.f *(1.f- (float)errorsCurvePlots[EPOCHMAX-1][1]/Na) + '%');
 
-        try {
-            FileWriter fw = new FileWriter("train.d");
-            for (int i =0; i < errorsCurvePlots.length; i += 1) {
-                fw.write(""+errorsCurvePlots[i][1]+","+0+"\n");
-            }
-            fw.close();
-        }
-        catch (IOException e) {
-			e.printStackTrace();
-		}
-        try {
+        String [] fileNames = new String[4];
+        fileNames[0] = "validationErrors";
+        fileNames[1] = "trainingErrors";
 
-            FileWriter fw = new FileWriter("val.d");
-            
-            for (int i =0; i < errorsCurvePlots.length; i += 1) {
-                fw.write(""+errorsCurvePlots[i][0]+","+0+"\n");
-            }
-            fw.close();
-        }
-        catch (IOException e) {
-			e.printStackTrace();
-		}
-        
+        fileNames[2] = "validationCosts";
+        fileNames[3] = "trainingCosts";
+
+        dataFilesWriter(fileNames,errorsCurvePlots);
+
+        String [] errorsNames = new String[2];
+        errorsNames[0] = fileNames[0];
+        errorsNames[1] = fileNames[1];
+
+        String [] costsNames = new String[2];
+        costsNames[0] = fileNames[2];
+        costsNames[1] = fileNames[3];
+
+
+        gnuplotFileWriter("errors",errorsNames,eta);
+
+        gnuplotFileWriter("costs",costsNames,eta);
+
+
         System.out.println("# Computation done.");
 
     }
-    	/*
-        System.out.println("# Load the database !");
-        MnistReader db = new MnistReader(labelDB, imageDB);
-        int Dim = db.getImage(1).length * db.getImage(1)[0].length+1;
-        
-        float[][] trainData = new float[Na][Dim];
-        int [] refs = new int[Na];
-        for (int imageIndex = 0; imageIndex < Na; imageIndex += 1) {
-        	trainData[imageIndex] = ConvertImage(db.getImage(imageIndex+1));
-        	refs [imageIndex] = db.getLabel(imageIndex+1) == classe?
-        			1:
-        			-1;
-        }
-        System.out.println("# Build train for digit "+ classe);
-        
-        System.out.println("# Load validation for digit "+ classe);
-        float[][] valData = new float[Nv][Dim];
-        int [] refsVal = new int[Nv];
-        for (int imageIndex = Na; imageIndex < Na+Nv; imageIndex += 1) {
-        	valData[imageIndex-Na] = ConvertImage(db.getImage(imageIndex+1));
-        	refsVal [imageIndex-Na] = db.getLabel(imageIndex+1) == classe ?
-        			1:
-        			-1;
-        }
-        System.out.println("# Built validation for digit "+ classe);
-        
-        PerceptronMulti numberTeller = new PerceptronMulti(Dim,10);
-        
-        OnlinePerceptron perceptron = new OnlinePerceptron(InitialiseW(Dim,1),trainData,refs,EPOCHMAX,valData,refsVal);
-        
-        int[][] errorsCurvePlots = perceptron.learnWithValidationCurve(0.5f);
-        
-        try {
-            FileWriter fw = new FileWriter("train.d");
-            for (int i =0; i < errorsCurvePlots.length; i += 1) {
-                fw.write(""+errorsCurvePlots[i][1]+","+0+"\n");
-            }
-            fw.close();
-        }
-        catch (IOException e) {
-			e.printStackTrace();
-		}
-        try {
-
-            FileWriter fw = new FileWriter("val.d");
-            for (int i =0; i < errorsCurvePlots.length; i += 1) {
-                fw.write(""+errorsCurvePlots[i][0]+","+0+"\n");
-            }
-            fw.close();
-        }
-        catch (IOException e) {
-			e.printStackTrace();
-		}
-        
-        System.out.println("# Computation done.");
-        
-        System.out.println("Validation accuracy : "+ 100.f * errorsCurvePlots[EPOCHMAX-1][1] /Nv +"%, Training accuracy : " + 100.f * errorsCurvePlots[EPOCHMAX-1][1]/Na + '%');
-    }
-    */
 }

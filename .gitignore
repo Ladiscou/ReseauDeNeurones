@@ -3,3 +3,7 @@
 /train.d
 /val.d
 /blabla/
+/costs.gnu
+/errors.gnu
+/*.svg
+/*.d

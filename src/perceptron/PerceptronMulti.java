@@ -144,19 +144,25 @@ public class PerceptronMulti {
 		return errors;
 	}
 
-	public float[][] learnWithErrorsCostsArray(float data[][], int dataLabels[], float dataTrain[][], int dataTrainLabels[],
+	public float[][] learnWithErrorsCostsArray(float data[][], int dataLabels[], float dataValidation[][], int dataValidationLabels[],
 			float eta, int maxStages) {
 		int [][]dataStickers = new int [dataLabels.length][m_stickersDim];
 		float[][] errors = new float[maxStages][4];
 		
 
-		
-		for (int stageIndx = 0; stageIndx < maxStages; stageIndx += 1) {
-			errors[stageIndx][0] = this.errorsDataSet(dataTrain,dataTrainLabels);
-			errors[stageIndx][1] = stage(data,dataLabels,dataStickers,eta);
-			errors[stageIndx][2] = costFunction(dataTrain,dataLabels);
-			errors[stageIndx][3] = costFunction(data,dataTrainLabels);
+
+		for (int stageIndx = 0; stageIndx < maxStages-1; stageIndx += 1) {
+			errors[stageIndx][0] = this.errorsDataSet(dataValidation,dataValidationLabels);
+			errors[stageIndx][1] = this.errorsDataSet(data,dataLabels);
+			errors[stageIndx][2] = costFunction(dataValidation,dataValidationLabels);
+			errors[stageIndx][3] = costFunction(data,dataLabels);
+			stage(data,dataLabels,dataStickers,eta);
 		}
+		errors[maxStages-1][0] = this.errorsDataSet(dataValidation,dataValidationLabels);
+		errors[maxStages-1][1] = this.errorsDataSet(data,dataLabels);
+		errors[maxStages-1][2] = costFunction(dataValidation,dataValidationLabels);
+		errors[maxStages-1][3] = costFunction(data,dataLabels);
+
 		return errors;
 	}
 

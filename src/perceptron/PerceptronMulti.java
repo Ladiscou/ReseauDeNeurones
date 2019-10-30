@@ -31,9 +31,12 @@ public class PerceptronMulti {
 		m_perceptronWeightsArray = new float[stickersDim][pointDim];
 		genRandomWeights(1.f/(pointDim));
 	}
-	
+
 	public int[] intToSticker(int a) {
 		int [] sticker = new int[m_stickersDim];
+		for(int i = 0; i < m_stickersDim; i ++){  //rajout de la boucle pour initialiser les autres valeurs a 0
+			sticker[i] = 0;
+		}
 		sticker[a%m_stickersDim] = 1;
 		return sticker;
 	}
@@ -146,6 +149,9 @@ public class PerceptronMulti {
 	public float[][] learnWithErrorsCostsArray(float data[][], int dataLabels[], float dataValidation[][], int dataValidationLabels[],
 			float eta, int maxStages) {
 		int [][]dataStickers = new int [dataLabels.length][m_stickersDim];
+		for(int stickerindex = 0; stickerindex < dataLabels.length; stickerindex ++){
+			dataStickers[stickerindex] = intToSticker(dataLabels[stickerindex]);
+		}
 		float[][] errors = new float[maxStages][4];
 		
 

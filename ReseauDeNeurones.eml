@@ -2,7 +2,7 @@
 <component inheritJdk="true">
 	<exclude-output/>
 	<contentEntry url="file://$MODULE_DIR$"/>
-	<levels>
-		<level name="mnist-tools" value="project"/>
-	</levels>
+	<lib name="mnist-tools.jar" scope="COMPILE">
+		<srcroot url="jar://$USER_HOME$/Téléchargements/mnist-tools.jar!/"/>
+	</lib>
 </component>

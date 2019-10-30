@@ -125,7 +125,7 @@ public class ImageOnlinePerceptron {
     public static void main(String[] args) {
     	System.out.println("# Load the database !");
         MnistReader db = new MnistReader(labelDB, imageDB);
-        int Dim = db.getImage(1).length * db.getImage(1)[0].length+1;
+        int Dim = (db.getImage(1).length * db.getImage(1)[0].length)+1;
         
         float[][] trainData = new float[Na][Dim];
         

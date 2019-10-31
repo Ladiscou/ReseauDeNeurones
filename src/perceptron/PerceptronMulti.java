@@ -74,7 +74,8 @@ public class PerceptronMulti {
 		float[] probas = probaForPoint(point);
 		for (int perceptronIndex =0; perceptronIndex < m_stickersDim; perceptronIndex+= 1) {
 			for (int weightIndex = 0; weightIndex < m_pointDim; weightIndex+=1) {
-				m_perceptronWeightsArray[perceptronIndex][weightIndex] -= eta * point[weightIndex] *(probas[perceptronIndex] - sticker[perceptronIndex]);
+				m_perceptronWeightsArray[perceptronIndex][weightIndex] -=
+						eta * point[weightIndex] *(probas[perceptronIndex] - sticker[perceptronIndex]);
 			}
 		}
 	}
@@ -129,7 +130,9 @@ public class PerceptronMulti {
 	}
 
 
-	public int[][] learnWithErrorsArray(float data[][], int dataLabels[], float dataValidation[][], int dataValidationLabels[], float eta, int maxStages) {
+	public int[][] learnWithErrorsArray(float data[][], int dataLabels[],
+										float dataValidation[][], int dataValidationLabels[],
+										float eta, int maxStages) {
 		int [][]dataStickers = new int [dataLabels.length][m_stickersDim];
 		int[][] errors = new int[maxStages][2];
 		
@@ -146,8 +149,9 @@ public class PerceptronMulti {
 		return errors;
 	}
 
-	public float[][] learnWithErrorsCostsArray(float data[][], int dataLabels[], float dataValidation[][], int dataValidationLabels[],
-			float eta, int maxStages) {
+	public float[][] learnWithErrorsCostsArray(float data[][], int dataLabels[],
+											   float dataValidation[][], int dataValidationLabels[],
+											   float eta, int maxStages) {
 		int [][]dataStickers = new int [dataLabels.length][m_stickersDim];
 		for(int stickerindex = 0; stickerindex < dataLabels.length; stickerindex ++){
 			dataStickers[stickerindex] = intToSticker(dataLabels[stickerindex]);

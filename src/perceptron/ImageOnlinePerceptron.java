@@ -108,7 +108,6 @@ public class ImageOnlinePerceptron {
         try {
             FileWriter fw = new FileWriter(plotName + ".gnu");
             fw.write("set terminal svg size 2000,1000 \nset output 'histogram");
-
             fw.write(""+plotName+eta);
             fw.write("Multi.svg'\nset title \"Na = "+Na+" Nv = "+Nv+"\" \n");
             fw.write("set grid\nset style data linespoints\nplot");

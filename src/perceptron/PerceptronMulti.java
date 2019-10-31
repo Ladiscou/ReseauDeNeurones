@@ -128,7 +128,35 @@ public class PerceptronMulti {
 		}
 		return Etotal/data.length;
 	}
+	/*
+	 * @return a matrix, with numbers in slots:
+	 * 					which lines (first index) indexes, are the class number the perceptron gave.
+	 * 					which columns (second index) indexes, are the class number they really are.
+	 */
+	public int[][] confusionMatrix(float data [][], int [] dataLabels){
+		int [][] confMat = new int[m_stickersDim][m_stickersDim];
 
+		for (int columnIndex = 0; columnIndex < m_stickersDim; columnIndex += 1){
+			for (int dataIndex =0; dataIndex < dataLabels.length; dataIndex+= 1){
+				if (columnIndex == dataLabels[dataIndex]){
+						int lineIndex = computeClass(data[dataIndex]);
+						confMat[lineIndex][columnIndex] += 1;
+				}
+
+
+			}
+		}
+		return confMat;
+	}
+
+	public String stringConfusionMatrix(float data [][], int [] dataLabels){
+		int[][] confMat = confusionMatrix(data,dataLabels);
+		String ret= tabToString(confMat[0]);
+		for (int i = 1; i < m_stickersDim; i+=1){
+			ret += '\n'+tabToString(confMat[i]);
+		}
+		return ret;
+	}
 
 	public int[][] learnWithErrorsArray(float data[][], int dataLabels[],
 										float dataValidation[][], int dataValidationLabels[],

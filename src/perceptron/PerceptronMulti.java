@@ -255,7 +255,7 @@ public class PerceptronMulti {
 		return perceptronRep;
 	}
 
-	/**
+	/** FiveBienClassee
 	 * fonction qui prend en paramètre les données(tableau de tableau de float) et leur label associé(tableau d'entiers)
 	 * @param data
 	 * @param datalabel
@@ -288,8 +288,8 @@ public class PerceptronMulti {
 		return res;
 	}
 
-	/**
-	 * fonctionqui prend en parametre les données(tableau de tableau de float) les lablels associés(tableau de int)
+	/** LesPlusLoins
+	 * fonction qui prend en parametre les données(tableau de tableau de float) les lablels associés(tableau de int)
 	 * et la calsse que l'on souhaite observer(un int)
 	 * @param data
 	 * @param datalabel

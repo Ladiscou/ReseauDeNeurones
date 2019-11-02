@@ -8,15 +8,25 @@ public class PerceptronMulti {
 	public int m_pointDim = 12;
 	public int m_stickersDim = 10;
 	private float m_perceptronWeightsArray [][] = new float[m_stickersDim][m_pointDim];
-	
-	
-	
+
+
+	/**
+	 * fonction d'initialisastion du perceptron
+	 * @param pointDim
+	 * @param stickersDim
+	 * @param weights
+	 */
 	public PerceptronMulti(int pointDim,int stickersDim, float weights[][]) {
 		m_pointDim = pointDim;
 		m_stickersDim = stickersDim;
 		m_perceptronWeightsArray = weights;
 	}
-	
+
+	/**genRandomWeights
+	 * fonction qui prend en paramtre un entier alpha et initialise les poid du perceptron de facon aleatoire mais
+	 * au meme ordre de grandeur
+	 * @param alpha
+	 */
 	private void genRandomWeights(float alpha) {
 		Random randGen= new Random();
 		
@@ -26,7 +36,12 @@ public class PerceptronMulti {
 			}
 		}
 	}
-	
+
+	/**
+	 * fonction d'initialisation du perceptron
+	 * @param pointDim
+	 * @param stickersDim
+	 */
 	public PerceptronMulti(int pointDim,int stickersDim) {
 		m_pointDim = pointDim;
 		m_stickersDim = stickersDim;
@@ -34,6 +49,12 @@ public class PerceptronMulti {
 		genRandomWeights(1.f/(pointDim));
 	}
 
+	/**
+	 * fonction qui prend en parametre un entier a representant une etiquette
+	 * @param a
+	 * @return un tableau d'entier ou de la taille du noubre de classe remplie de 0 et ou la seule valeur non nulle
+	 * est a l'indice a
+	 */
 	public int[] intToSticker(int a) {
 		int [] sticker = new int[m_stickersDim];
 		for(int i = 0; i < m_stickersDim; i ++){  //rajout de la boucle pour initialiser les autres valeurs a 0
@@ -42,7 +63,13 @@ public class PerceptronMulti {
 		sticker[a%m_stickersDim] = 1;
 		return sticker;
 	}
-	
+
+	/**
+	 * fonction qui prend en parametre deux tableaux d'entier representant deux vecteurs
+	 * @param a
+	 * @param b
+	 * @return un floatant representant le resultat du produit vectoriel entre a et b
+	 */
 	private float dotProd(float[] a, float[] b) {
 		float sum = 0;
 		for (int i =0; i < m_pointDim; i += 1) {
@@ -50,8 +77,12 @@ public class PerceptronMulti {
 		}
 		return sum;
 	}
-	
-	
+
+	/**
+	 * fonction qui prend en parametre un tableau de floattant representant une donnée
+	 * @param point
+	 * @return un tableau de floattant representant les probabilité que la donnée a d'appartenir a chaque calsse
+	 */
 	public float[] probaForPoint(float[] point){
 		float [] proba = new float[m_stickersDim];
 		float [] expFromPointAndWeight = new float[m_stickersDim];
@@ -68,10 +99,15 @@ public class PerceptronMulti {
 		}
 		return proba;
 	}
-	
-	
-	
-	
+
+
+	/**
+	 * fonction qui prend en parametre un point(tableau de float) le tableau associé a son etiquette(tableau de int)
+	 * eta le taux d'apprentissage(un int). la fonction met a jour les parametre du perceptron
+	 * @param point
+	 * @param sticker
+	 * @param eta
+	 */
 	private void learnFromPoint(float point[], int [] sticker,float eta) {
 		float[] probas = probaForPoint(point);
 		for (int perceptronIndex =0; perceptronIndex < m_stickersDim; perceptronIndex+= 1) {
@@ -81,7 +117,12 @@ public class PerceptronMulti {
 			}
 		}
 	}
-	
+
+	/**
+	 * fonction qui prend en parametre un point(un tableau de float)
+	 * @param point
+	 * @return un entier representant la classe de la donnée estimé par le perceptron
+	 */
 	public int computeClass (float point[]) {
 		float [] proba = probaForPoint(point);
 		float maxProb = proba[0];
@@ -94,15 +135,30 @@ public class PerceptronMulti {
 		}
 		return maxIndex;
 	}
-	
-	
+
+	/**
+	 * fonction qui prend en parametre toute les données(tableau de tableau de float), leur etiquette associés
+	 * (tableau de int), les tableau issue de intToSticker de chaque donnée(tableau de tableau de int) et le taux
+	 * d'apprentissage eta (un float) et fait un epoque avec le jeu de donnée
+	 * @param data
+	 * @param dataLabels
+	 * @param dataStickers
+	 * @param eta
+	 */
 	public void stage(float data[][], int [] dataLabels, int [][] dataStickers, float eta) {
 		int errorsNb = 0;
     	for (int i = 0; i < data.length; i +=1) {
 			learnFromPoint(data[i], dataStickers[i], eta);
 		}
 	}
-	
+
+	/**fonction qui prend en parametre le jeu de donnée (tableau de tableau de float), les label associé(tableau de int),
+	 * le taux d'apprentissage(un float), le nombre max d'époque(un int). fait faire epoque max epoque au jeu de donnée
+	 * @param data
+	 * @param dataLabels
+	 * @param eta
+	 * @param maxStages
+	 */
 	public void learn(float data[][], int dataLabels[], float eta, int maxStages) {
 		int [][]dataStickers = new int [dataLabels.length][m_stickersDim];
 		for (int i =0; i < dataLabels.length; i += 1) {
@@ -112,7 +168,13 @@ public class PerceptronMulti {
 			stage(data,dataLabels,dataStickers,eta);
 		}
 	}
-	
+
+	/**
+	 * fonction qui prend en parametre le jeu de donnée(un tableau de tableau de float), les labels associés(tableau de int)
+	 * @param data
+	 * @param dataLabels
+	 * @return un int qui represente le nombre d'erreur sur le jeux de donnée par rapport au jeux de donnée actuel
+	 */
 	public int errorsDataSet(float data[][], int dataLabels[]) {
 		int nbErrors = 0;
 		for (int i = 0; i < data.length; i += 1) {
@@ -123,6 +185,13 @@ public class PerceptronMulti {
 		return nbErrors;
 	}
 
+	/**
+	 * fonction qui prend en parametre le jeu de donnée(tableau de tableau de float), les labels associés(un tableau de
+	 * int)
+	 * @param data
+	 * @param dataLabels
+	 * @return la valeur de la fonction de cout lier au jeu de donnée
+	 */
 	private float costFunction(float data[][], int [] dataLabels) {
 		float Etotal = 0;
 		for (int imageIndex = 0; imageIndex < data.length; imageIndex += 1) {

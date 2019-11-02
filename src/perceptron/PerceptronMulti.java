@@ -1,6 +1,8 @@
 package perceptron;
 
+import java.util.Iterator;
 import java.util.Random;
+import java.util.ArrayList;
 
 public class PerceptronMulti {
 	public int m_pointDim = 12;
@@ -151,7 +153,7 @@ public class PerceptronMulti {
 
 	public String stringConfusionMatrix(float data [][], int [] dataLabels){
 		int[][] confMat = confusionMatrix(data,dataLabels);
-		String ret= tabToString(confMat[0]);
+		String ret = tabToString(confMat[0]);
 		for (int i = 1; i < m_stickersDim; i+=1){
 			ret += '\n'+tabToString(confMat[i]);
 		}
@@ -252,7 +254,77 @@ public class PerceptronMulti {
 		perceptronRep += "......end....Perceptron[" +m_stickersDim + "x" + m_pointDim +  "]......";
 		return perceptronRep;
 	}
-	
+
+	/**
+	 * fonction qui prend en paramètre les données(tableau de tableau de float) et leur label associé(tableau d'entiers)
+	 * @param data
+	 * @param datalabel
+	 * @returnun tableau d'entier contenant l'indice des 5 images bien classé avec la plus faible probabilité
+	 */
+	public int[] FiveBienClassee(float data[][], int datalabel[]){
+		int[] res = new int[5];
+		ArrayList<Integer> BienClassee = new ArrayList<Integer>();
+		for(int i = 0; i < data.length; i++){
+			if(computeClass(data[i]) == datalabel[i]){
+				BienClassee.add(i);
+			}
+		}
+		int u = 0;
+		while(u < 5) {
+			float probamin = 1;
+			Iterator<Integer> iter = BienClassee.iterator();
+			while (iter.hasNext()) {
+				int a = iter.next();
+				float[] proba = probaForPoint(data[a]);
+				if (proba[computeClass(data[a])] < probamin) {
+					res[u] = a;
+					probamin = proba[computeClass(data[a])];
+				}
+			}
+			int pos = BienClassee.indexOf(res[u]);
+			BienClassee.remove(pos);
+			u++;
+		 }
+		return res;
+	}
+
+	/**
+	 * fonctionqui prend en parametre les données(tableau de tableau de float) les lablels associés(tableau de int)
+	 * et la calsse que l'on souhaite observer(un int)
+	 * @param data
+	 * @param datalabel
+	 * @param classe
+	 * @return un tableau de int representant les indices des données mal classées de la classe donnée en parametre
+	 * mais avec les plus forte probabilité de lui appartenir
+	 */
+	public int[] LesPlusLoins(float data[][], int datalabel[], int classe){
+		int[] res = new int[5];
+		ArrayList<Integer> MalClassee = new ArrayList<Integer>();
+		for(int i = 0; i < data.length; i++){
+			if(computeClass(data[i]) != datalabel[i] && datalabel[i] == classe){
+				MalClassee.add(i);
+			}
+		}
+		int u  = 0;
+		while(u < 5){
+			float probaMax = 0;
+			Iterator<Integer> iter = MalClassee.iterator();
+			while(iter.hasNext()){
+				int a = iter.next();
+				float[] proba = probaForPoint(data[a]);
+				if(proba[datalabel[a]] > probaMax){
+					res[u] = a;
+					probaMax = proba[datalabel[a]];
+				}
+			}
+			int pos = MalClassee.indexOf(res[u]);
+			MalClassee.remove((pos));
+			u++;
+		}
+		return res;
+	}
+
+
 
 	
 	

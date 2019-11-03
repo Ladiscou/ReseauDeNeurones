@@ -121,6 +121,14 @@ public class ImageOnlinePerceptron {
             e.printStackTrace();
         }
     }
+    private static String tabToString(int [] tab){
+        String repTab = "[";
+        for (int i =0; i < tab.length-1; i +=1) {
+            repTab += "" + tab[i] +",";
+        }
+        repTab += "" + tab[ tab.length-1] + "]";
+        return repTab;
+    }
 
     public static void main(String[] args) {
     	System.out.println("# Load the database !");
@@ -189,6 +197,7 @@ public class ImageOnlinePerceptron {
         System.out.println(numberTeller);
         System.out.println(numberTeller.stringConfusionMatrix(valData,refsVal));
         System.out.println("# Computation done.");
-
+        System.out.println(tabToString(numberTeller.FiveBienClassee(valData, refsVal)));
+        System.out.println(tabToString(numberTeller.LesPlusLoins(valData, refsVal, 5)));
     }
 }

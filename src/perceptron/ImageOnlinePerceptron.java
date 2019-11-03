@@ -187,7 +187,7 @@ public class ImageOnlinePerceptron {
         System.out.println(numberTeller.probaForPointString(trainData[Na/2]));
         System.out.println(numberTeller.oneHotForLabel(refs[Na/2]));
         System.out.println(numberTeller);
-        System.out.println(numberTeller.stringConfusionMatrix(trainData,refs));
+        System.out.println(numberTeller.stringConfusionMatrix(valData,refsVal));
         System.out.println("# Computation done.");
 
     }

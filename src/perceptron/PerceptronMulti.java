@@ -135,7 +135,6 @@ public class PerceptronMulti {
 	 */
 	public int[][] confusionMatrix(float data [][], int [] dataLabels){
 		int [][] confMat = new int[m_stickersDim][m_stickersDim];
-
 		for (int columnIndex = 0; columnIndex < m_stickersDim; columnIndex += 1){
 			for (int dataIndex =0; dataIndex < dataLabels.length; dataIndex+= 1){
 				if (columnIndex == dataLabels[dataIndex]){
@@ -212,13 +211,28 @@ public class PerceptronMulti {
 		repTab += "" + tab[ tab.length-1] + "]";
 		return repTab;
 	}
-
+	private static String intSized(int n,int size){
+		String toReturn = new String();
+		int a= n;
+		if (n==0){
+			a = 1;
+		}
+		int num = 0;
+		for (; a >0; a /= 10, num++);
+		for (; num<size; num+=1){
+			toReturn += " ";
+		}
+		toReturn += n;
+		return toReturn;
+	}
 	private static String tabToString(int [] tab){
 		String repTab = "[";
 		for (int i =0; i < tab.length-1; i +=1) {
-			repTab += "" + tab[i] +",";
+			int a = tab[i];
+
+			repTab += intSized(tab[i],4) +",";
 		}
-		repTab += "" + tab[ tab.length-1] + "]";
+		repTab += "" + intSized(tab[ tab.length-1],4) + "]";
 		return repTab;
 	}
 

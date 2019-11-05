@@ -199,10 +199,13 @@ public class PerceptronMulti {
 		}
 		return Etotal/data.length;
 	}
-	/*
+
+	/**
 	 * @return a matrix, with numbers in slots:
-	 * 					which lines (first index) indexes, are the class number the perceptron gave.
-	 * 					which columns (second index) indexes, are the class number they really are.
+	 * 	 * 						which lines (first index) indexes, are the class number the perceptron gave.
+	 * 	 *	 					which columns (second index) indexes, are the class number they really are.
+	 * @param data points
+	 * @param dataLabels points class
 	 */
 	public int[][] confusionMatrix(float data [][], int [] dataLabels){
 		int [][] confMat = new int[m_stickersDim][m_stickersDim];
@@ -219,6 +222,12 @@ public class PerceptronMulti {
 		return confMat;
 	}
 
+	/**
+	 *
+	 * @param data
+	 * @param dataLabels
+	 * @return la representation de la matrice de confusion.
+	 */
 	public String stringConfusionMatrix(float data [][], int [] dataLabels){
 		int[][] confMat = confusionMatrix(data,dataLabels);
 		String ret = tabToString(confMat[0]);
@@ -228,6 +237,19 @@ public class PerceptronMulti {
 		return ret;
 	}
 
+	/**
+	 *
+	 * @param data training points
+	 * @param dataLabels training points's classes
+	 *
+	 * @param dataValidation validation's points
+	 * @param dataValidationLabels validation's classes
+	 *
+	 * @param eta learning coefficient
+	 * @param maxStages number of repetition.
+	 *
+	 * @return data for graph (int[maxStages][]
+	 */
 	public int[][] learnWithErrorsArray(float data[][], int dataLabels[],
 										float dataValidation[][], int dataValidationLabels[],
 										float eta, int maxStages) {
@@ -315,6 +337,10 @@ public class PerceptronMulti {
 	    return tabToString(intToSticker(label));
     }
 
+	/**
+	 * override of toString() function gives the perceptron's weights.
+	 * @return
+	 */
 	@Override
 	public String toString(){
 		String perceptronRep = "......begin..Perceptron[" +m_stickersDim + "x" + m_pointDim +  "]......\n[";
@@ -352,21 +378,21 @@ public class PerceptronMulti {
 				BienClassee.add(i);
 			}
 		}
-		int u = 0;
-		while(u < 5) {
+		int tabIndex = 0;
+		while(tabIndex < 5) {
 			float probamin = 1;
 			Iterator<Integer> iter = BienClassee.iterator();
 			while (iter.hasNext()) {
-				int a = iter.next();
-				float[] proba = probaForPoint(data[a]);
-				if (proba[computeClass(data[a])] < probamin) {
-					res[u] = a;
-					probamin = proba[computeClass(data[a])];
+				int pointIndex = iter.next();
+				float[] proba = probaForPoint(data[pointIndex]);
+				if (proba[computeClass(data[pointIndex])] < probamin) {
+					res[tabIndex] = pointIndex;
+					probamin = proba[computeClass(data[pointIndex])];
 				}
 			}
-			int pos = BienClassee.indexOf(res[u]);
+			int pos = BienClassee.indexOf(res[tabIndex]);
 			BienClassee.remove(pos);
-			u++;
+			tabIndex++;
 		 }
 		return res;
 	}
@@ -388,21 +414,21 @@ public class PerceptronMulti {
 				MalClassee.add(i);
 			}
 		}
-		int u  = 0;
-		while(u < 5){
+		int tabIndex  = 0;
+		while(tabIndex < 5){
 			float probaMax = 0;
 			Iterator<Integer> iter = MalClassee.iterator();
 			while(iter.hasNext()){
-				int a = iter.next();
-				float[] proba = probaForPoint(data[a]);
-				if(proba[datalabel[a]] > probaMax){
-					res[u] = a;
-					probaMax = proba[datalabel[a]];
+				int pointIndex = iter.next();
+				float[] proba = probaForPoint(data[pointIndex]);
+				if(proba[datalabel[pointIndex]] > probaMax){
+					res[tabIndex] = pointIndex;
+					probaMax = proba[datalabel[pointIndex]];
 				}
 			}
-			int pos = MalClassee.indexOf(res[u]);
+			int pos = MalClassee.indexOf(res[tabIndex]);
 			MalClassee.remove((pos));
-			u++;
+			tabIndex++;
 		}
 		return res;
 	}
@@ -421,7 +447,7 @@ public class PerceptronMulti {
 		System.out.println("proba classes : " + tabToString(multPerceptron.probaForPoint(point)));
 
 		float proba[] = multPerceptron.probaForPoint(point);
-		
+
 		int stickerPoint[] = multPerceptron.intToSticker(2);
 		multPerceptron.learnFromPoint(point,stickerPoint,1);
 		

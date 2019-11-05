@@ -11,18 +11,18 @@ public class ImageOnlinePerceptron {
 
     /* Les donnees */
     public static String path="src/resources/";
-    public static String labelDB=path+"train-labels-idx1-ubyte";
-    public static String imageDB=path+"train-images-idx3-ubyte";
+    public static String labelDB=path+"emnist-byclass-train-labels-idx1-ubyte";
+    public static String imageDB=path+"emnist-byclass-train-images-idx3-ubyte";
 
     /* Parametres */
     // Na exemples pour l'ensemble d'apprentissage
-    public static final int Na = 1000;
+    public static final int Na = 500;
     // Nv exemples pour l'ensemble d'évaluation
     public static final int Nv = 500;
     // Nombre d'epoque max
     public final static int EPOCHMAX=50;
     // Classe positive (le reste sera considere comme des ex. negatifs):
-    public static int  classe = 5;
+    public static int  classe = 26;
 
     // Générateur de nombres aléatoires
     public static int seed = 1234;
@@ -108,7 +108,7 @@ public class ImageOnlinePerceptron {
         try {
             FileWriter fw = new FileWriter(plotName + ".gnu");
             fw.write("set terminal svg size 2000,1000 \nset output 'histogram");
-            fw.write(""+plotName+eta);
+            fw.write(""+plotName+eta+""+classe);
             fw.write("Multi.svg'\nset title \"Na = "+Na+" Nv = "+Nv+"\" \n");
             fw.write("set grid\nset style data linespoints\nplot");
             for (int i = 0; i < fileNames.length-1; i+= 1){

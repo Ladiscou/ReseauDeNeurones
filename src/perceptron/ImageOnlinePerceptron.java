@@ -22,7 +22,7 @@ public class ImageOnlinePerceptron {
     // Nombre d'epoque max
     public final static int EPOCHMAX=50;
     // Classe positive (le reste sera considere comme des ex. negatifs):
-    public static int  classe = 26;
+    public static int  classe = 12;
 
     // Générateur de nombres aléatoires
     public static int seed = 1234;
@@ -130,49 +130,79 @@ public class ImageOnlinePerceptron {
         return repTab;
     }
 
-    public static void main(String[] args) {
-    	System.out.println("# Load the database !");
+
+    public static int dataGenerator(int minLabel, int maxLabel, int startIndex, float [][] data, int dataDim,
+                                    int [] refs, MnistReader db){
+        int imageIndex = startIndex;
+        int length = db.getTotalImages();
+        for (int trainDataIndex = 0; trainDataIndex < refs.length && imageIndex < length; imageIndex += 1) {
+            int imageLabel = db.getLabel(imageIndex+1);
+            if (imageLabel >=minLabel && imageLabel <= maxLabel){
+                data[trainDataIndex] = ConvertImage(BinariserImage(db.getImage(imageIndex+1),50));
+                refs [trainDataIndex] = db.getLabel(imageIndex+1)-10;
+                trainDataIndex += 1;
+            }
+        }
+
+        return imageIndex;
+    }
+
+    /**
+     *
+     * @param minLabel label extracted begin
+     * @param maxLabel label extracted end
+     *
+     * @param Na Size of the training data
+     * @param Nv Size of the validation data
+     *
+     * @param filePrefix general name of the files generated (data for curves & gnuplotter)
+     *
+     * @param stagesNumber number of stages.
+     * @param eta training rate
+     *
+     * @return PerceptronMulti trained with data perceptron.
+     * @creates files with the evolution data of the perceptron.
+     */
+    public static PerceptronMulti genPerceptronPlusCurves(int minLabel,int maxLabel, int Na, int Nv,
+                                                           String filePrefix,int stagesNumber, float eta){
+        classe = maxLabel - minLabel + 1;
+        System.out.println("# Load the database for " + filePrefix + " !");
         MnistReader db = new MnistReader(labelDB, imageDB);
         int Dim = (db.getImage(1).length * db.getImage(1)[0].length)+1;
-        
+
         float[][] trainData = new float[Na][Dim];
-        
-        int [] refs = new int[Na];
-        for (int imageIndex = 0; imageIndex < Na; imageIndex += 1) {
-        	trainData[imageIndex] = ConvertImage(BinariserImage(db.getImage(imageIndex+1),50));
-        	refs [imageIndex] = db.getLabel(imageIndex+1);
-        }
-        System.out.println("# Built train for digits ");
-        
+
+        int [] refs= new int[Na];
+
+        int imageIndex = 0;
+
+        imageIndex = dataGenerator(minLabel,maxLabel,imageIndex,trainData,Dim,refs,db);
+
+        System.out.println("# Built train for "+filePrefix + ".");
+
         System.out.println("# Load validation for digits ");
-        float[][] valData = new float[Nv][Dim];
+
+        float[][] valData = new float [Nv][Dim];
         int [] refsVal = new int[Nv];
-        for (int imageIndex = Na; imageIndex < Na+Nv; imageIndex += 1) {
-        	valData[imageIndex-Na] = ConvertImage(BinariserImage(db.getImage(imageIndex+1),125));
-        	refsVal [imageIndex-Na] = db.getLabel(imageIndex+1);
-        }
-        System.out.println("# Built validation for digits ");
-        
-        PerceptronMulti numberTeller = new PerceptronMulti(Dim,10);
-        System.out.println(numberTeller.probaForPointString(trainData[2]));
-        System.out.println(numberTeller.oneHotForLabel(refs[2]));
 
-        System.out.println(numberTeller.probaForPointString(trainData[Na/2]));
-        System.out.println(numberTeller.oneHotForLabel(refs[Na/2]));
+        imageIndex = dataGenerator(minLabel,maxLabel,imageIndex,valData,Dim,refsVal,db);
 
-        float eta = 0.0005f;
-        float [][] errorsCurvePlots = numberTeller.learnWithErrorsCostsArray(trainData, refs, valData, refsVal, eta, EPOCHMAX);
+        System.out.println("# Built validation for "+filePrefix+".");
+
+        PerceptronMulti perceptron = new PerceptronMulti(Dim,classe);
+
+        float [][] errorsCurvePlots = perceptron.learnWithErrorsCostsArray(trainData, refs, valData, refsVal, eta, EPOCHMAX);
         System.out.println("# Perceptron done.");
 
         System.out.println("Validation accuracy : "+ 100.f * (1.f- (float)(errorsCurvePlots[EPOCHMAX-1][0]) /Nv) +
-        					"%, Training accuracy : " + 100.f *(1.f- (float)errorsCurvePlots[EPOCHMAX-1][1]/Na) + '%');
+                "%, Training accuracy : " + 100.f *(1.f- (float)errorsCurvePlots[EPOCHMAX-1][1]/Na) + '%');
 
         String [] fileNames = new String[4];
-        fileNames[0] = "validationErrors";
-        fileNames[1] = "trainingErrors";
+        fileNames[0] = filePrefix + "ValidationErrors";
+        fileNames[1] = filePrefix + "TrainingErrors";
 
-        fileNames[2] = "validationCosts";
-        fileNames[3] = "trainingCosts";
+        fileNames[2] = filePrefix + "ValidationCosts";
+        fileNames[3] = filePrefix + "TrainingCosts";
 
         dataFilesWriter(fileNames,errorsCurvePlots);
 
@@ -185,19 +215,18 @@ public class ImageOnlinePerceptron {
         costsNames[1] = fileNames[3];
 
 
-        gnuplotFileWriter("errors",errorsNames,eta);
+        gnuplotFileWriter(filePrefix + "Errors",errorsNames,eta);
 
-        gnuplotFileWriter("costs",costsNames,eta);
+        gnuplotFileWriter(filePrefix + "Costs",costsNames,eta);
+        System.out.println("# Computation done" + filePrefix + ".");
+        return perceptron;
+    }
 
-        System.out.println(numberTeller.probaForPointString(trainData[2]));
-        System.out.println(numberTeller.oneHotForLabel(refs[2]));
 
-        System.out.println(numberTeller.probaForPointString(trainData[Na/2]));
-        System.out.println(numberTeller.oneHotForLabel(refs[Na/2]));
-        System.out.println(numberTeller);
-        System.out.println(numberTeller.stringConfusionMatrix(valData,refsVal));
-        System.out.println("# Computation done.");
-        System.out.println(tabToString(numberTeller.FiveBienClassee(valData, refsVal)));
-        System.out.println(tabToString(numberTeller.LesPlusLoins(valData, refsVal, 5)));
+
+
+    public static void main(String[] args) {
+        genPerceptronPlusCurves(10,21,500,100 ,"tenToTwentyOne",
+                50,0.001f);
     }
 }

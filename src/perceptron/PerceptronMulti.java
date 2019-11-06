@@ -195,7 +195,7 @@ public class PerceptronMulti {
 	private float costFunction(float data[][], int [] dataLabels) {
 		float Etotal = 0;
 		for (int imageIndex = 0; imageIndex < data.length; imageIndex += 1) {
-			Etotal += (float) Math.log(probaForPoint(data[imageIndex])[dataLabels[imageIndex]]);
+ 			Etotal += (float) Math.log(probaForPoint(data[imageIndex])[dataLabels[imageIndex]]);
 		}
 		return Etotal/data.length;
 	}
@@ -410,12 +410,16 @@ public class PerceptronMulti {
 		int[] res = new int[5];
 		ArrayList<Integer> MalClassee = new ArrayList<Integer>();
 		for(int i = 0; i < data.length; i++){
-			if(computeClass(data[i]) != datalabel[i] && datalabel[i] == classe){
+			if(datalabel[i] == classe && computeClass(data[i]) != datalabel[i]){
 				MalClassee.add(i);
 			}
 		}
 		int tabIndex  = 0;
-		while(tabIndex < 5){
+		int pointNumber = 5;
+		if (pointNumber > MalClassee.size()){
+			pointNumber = MalClassee.size();
+		}
+		while(tabIndex < pointNumber){
 			float probaMax = 0;
 			Iterator<Integer> iter = MalClassee.iterator();
 			while(iter.hasNext()){

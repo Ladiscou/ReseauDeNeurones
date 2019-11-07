@@ -228,5 +228,14 @@ public class ImageOnlinePerceptron {
     public static void main(String[] args) {
         genPerceptronPlusCurves(10,21,500,100 ,"tenToTwentyOne",
                 50,0.001f);
+        genPerceptronPlusCurves(10,21,500,100 ,"tenToTwentyOne",
+                50,0.005f);
+        genPerceptronPlusCurves(10,21,500,100 ,"tenToTwentyOne",
+                50,0.01f);
+        genPerceptronPlusCurves(10,21,500,100 ,"tenToTwentyOne",
+                50,0.05f);
+        genPerceptronPlusCurves(10,21,500,100 ,"tenToTwentyOne",
+                50,0.05f);
+
     }
 }

@@ -215,8 +215,6 @@ public class PerceptronMulti {
 						int lineIndex = computeClass(data[dataIndex]);
 						confMat[lineIndex][columnIndex] += 1;
 				}
-
-
 			}
 		}
 		return confMat;

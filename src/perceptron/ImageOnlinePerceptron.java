@@ -2,8 +2,7 @@ package perceptron;
 
 import mnisttools.MnistReader;
 
-import java.io.FileWriter;
-import java.io.IOException;
+import java.io.*;
 import java.util.Random;
 
 public class ImageOnlinePerceptron {
@@ -111,6 +110,34 @@ public class ImageOnlinePerceptron {
                 e.printStackTrace();
             }
         }
+    }
+
+    private static float getBestCost(String fileName) throws IOException {
+        BufferedReader reader = new BufferedReader(new FileReader(fileName));
+        float maxCost = -50000;
+
+        try {
+            String line;
+            String[] numbers = null;
+            float number;
+
+            // read line by line till end of file
+            while ((line = reader.readLine()) != null) {
+                // split each line based on regular expression having
+                // "any digit followed by one or more spaces".
+
+                numbers = line.split(",");
+
+                 number = Float.valueOf(numbers[0].trim());
+                 if (maxCost < number){
+                     maxCost = number;
+                 }
+
+                }
+            } finally{
+                reader.close();
+        }
+        return maxCost;
     }
 
     private static void gnuplotFileWriter(String plotName,String[] fileNames,float eta){
@@ -231,17 +258,22 @@ public class ImageOnlinePerceptron {
 
 
 
-    public static void main(String[] args) {
-        genPerceptronPlusCurves(10,21,500,100 ,"tenToTwentyOne",
-                50,0.001f);
-        genPerceptronPlusCurves(10,21,500,100 ,"tenToTwentyOne",
-                50,0.005f);
-        genPerceptronPlusCurves(10,21,500,100 ,"tenToTwentyOne",
-                50,0.01f);
-        genPerceptronPlusCurves(10,21,500,100 ,"tenToTwentyOne",
-                50,0.05f);
-        genPerceptronPlusCurves(10,21,500,100 ,"tenToTwentyOne",
-                50,0.05f);
+    public static void main(String[] args) throws IOException {
 
+        for (int Na = 1000; Na <= 10000; Na += 100) {
+            genPerceptronPlusCurves(10, 21, Na, 1000, "tenToTwentyOne" + Na,
+                    100, 0.001f);
+
+        }
+
+        try {
+            FileWriter fw = new FileWriter("bestCostRegardingNa.d");
+            for (int Na = 1000; Na <= 10000; Na += 100) {
+                fw.write("" + getBestCost("tenToTwentyOne"+Na+"ValidationCosts.d") + "," + Na + "\n");
+            }
+            fw.close();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
     }
 }

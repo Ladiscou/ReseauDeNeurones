@@ -23,6 +23,16 @@ public class OnlinePerceptron  {
     	refs = refs2;
     	m_maxEpoch = maxEpoch;
 	}
+
+	/**
+	 * initialise le perceptron
+	 * @param W
+	 * @param trainData
+	 * @param refs2
+	 * @param maxEpoch
+	 * @param valData
+	 * @param valRefs
+	 */
     public OnlinePerceptron( float[] W, float[][] trainData, int[] refs2,int maxEpoch, float[][] valData, int [] valRefs) {
     	w = W;
     	data = trainData; 
@@ -132,6 +142,11 @@ public class OnlinePerceptron  {
     	}
     	return i;
     }
+
+	/**
+	 * calcule le nombre d'erreur du perceptron avec son jeu de donnée
+	 * @return un int, le nombre d'erreur
+	 */
 	public int nbErreursVal() {
 		int nbErreurs =0;
     	for (int i = 0; i < m_valData.length; i +=1) {
@@ -141,7 +156,11 @@ public class OnlinePerceptron  {
     	}
     	return nbErreurs;
 	}
-	
+
+	/**
+	 * calcule le nombre d'erreur sur le jeu de donnée d'entrainement
+	 * @return un int, le nombre d'erreur
+	 */
 	public int nbErreursTrain() {
 		int nbErreurs =0;
     	for (int i = 0; i < data.length; i +=1) {

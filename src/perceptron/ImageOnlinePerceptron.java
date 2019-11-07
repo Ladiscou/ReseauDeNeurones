@@ -18,11 +18,16 @@ public class ImageOnlinePerceptron {
     // Na exemples pour l'ensemble d'apprentissage
     public static final int Na = 500;
     // Nv exemples pour l'ensemble d'évaluation
-    public static final int Nv = 500;
+    public static final int Nv = 1000;
+    //Nt exemple pour l'ensemble de test
+    public static final int Nt = 1000;
     // Nombre d'epoque max
     public final static int EPOCHMAX=50;
     // Classe positive (le reste sera considere comme des ex. negatifs):
     public static int  classe = 12;
+    // index actuel dans la base de donnée
+    private static int imageIndex = 0;
+
 
     // Générateur de nombres aléatoires
     public static int seed = 1234;
@@ -89,6 +94,11 @@ public class ImageOnlinePerceptron {
     	return w;
     }
 
+    /**
+     * fonction qui crée un fichier et y ecrit les donnée
+     * @param fileNames
+     * @param data
+     */
     private static void dataFilesWriter(String[] fileNames, float data[][]) {
         for (int j = 0; j < fileNames.length; j += 1) {
             try {
@@ -102,7 +112,6 @@ public class ImageOnlinePerceptron {
             }
         }
     }
-
 
     private static void gnuplotFileWriter(String plotName,String[] fileNames,float eta){
         try {
@@ -131,9 +140,9 @@ public class ImageOnlinePerceptron {
     }
 
 
-    public static int dataGenerator(int minLabel, int maxLabel, int startIndex, float [][] data, int dataDim,
+    public static void dataGenerator(int minLabel, int maxLabel, int startIndex, float [][] data, int dataDim,
                                     int [] refs, MnistReader db){
-        int imageIndex = startIndex;
+        imageIndex = startIndex;
         int length = db.getTotalImages();
         for (int trainDataIndex = 0; trainDataIndex < refs.length && imageIndex < length; imageIndex += 1) {
             int imageLabel = db.getLabel(imageIndex+1);
@@ -143,8 +152,6 @@ public class ImageOnlinePerceptron {
                 trainDataIndex += 1;
             }
         }
-
-        return imageIndex;
     }
 
     /**
@@ -165,6 +172,7 @@ public class ImageOnlinePerceptron {
      */
     public static PerceptronMulti genPerceptronPlusCurves(int minLabel,int maxLabel, int Na, int Nv,
                                                            String filePrefix,int stagesNumber, float eta){
+        imageIndex = 0;
         classe = maxLabel - minLabel + 1;
         System.out.println("# Load the database for " + filePrefix + " !");
         MnistReader db = new MnistReader(labelDB, imageDB);
@@ -174,9 +182,8 @@ public class ImageOnlinePerceptron {
 
         int [] refs= new int[Na];
 
-        int imageIndex = 0;
 
-        imageIndex = dataGenerator(minLabel,maxLabel,imageIndex,trainData,Dim,refs,db);
+        dataGenerator(minLabel,maxLabel,imageIndex,trainData,Dim,refs,db);
 
         System.out.println("# Built train for "+filePrefix + ".");
 
@@ -185,7 +192,7 @@ public class ImageOnlinePerceptron {
         float[][] valData = new float [Nv][Dim];
         int [] refsVal = new int[Nv];
 
-        imageIndex = dataGenerator(minLabel,maxLabel,imageIndex,valData,Dim,refsVal,db);
+        dataGenerator(minLabel,maxLabel,imageIndex,valData,Dim,refsVal,db);
 
         System.out.println("# Built validation for "+filePrefix+".");
 

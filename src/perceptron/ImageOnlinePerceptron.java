@@ -119,6 +119,7 @@ public class ImageOnlinePerceptron {
             fw.write("set terminal svg size 2000,1000 \nset output 'histogram");
             fw.write(""+plotName+eta+""+classe);
             fw.write("Multi.svg'\nset title \"Na = "+Na+" Nv = "+Nv+"\" \n");
+            fw.write("set object 1 rectangle from screen 0,0 to screen 1,1 fillcolor rgb\"white\" behind");
             fw.write("set grid\nset style data linespoints\nplot");
             for (int i = 0; i < fileNames.length-1; i+= 1){
                 fw.write("'"+fileNames[i] + ".d',");

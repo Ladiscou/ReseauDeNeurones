@@ -72,22 +72,6 @@ public class ImageOnlinePerceptron {
             return uniDim;
     }
 
-    /*
-    *  InitialiseW :
-    *      sizeW : la taille du vecteur de poids
-    *      alpha : facteur à rajouter devant le nombre aléatoire
-    *
-    *  le vecteur de poids est crée et initialisé à l'aide d'un générateur
-    *  de nombres aléatoires.
-    */
-    public static float[] InitialiseW(int sizeW, float alpha) {
-            // TODO
-    	float[] w = new float[sizeW];
-    	for (int i = 0; i < sizeW; i += 1) {
-    		w[i] = alpha * GenRdm.nextFloat();
-    	}
-    	return w;
-    }
 
     private static void dataFilesWriter(String[] fileNames, float data[][]) {
         for (int j = 0; j < fileNames.length; j += 1) {
@@ -131,7 +115,20 @@ public class ImageOnlinePerceptron {
         return repTab;
     }
 
-
+    /**
+     * Creates a dataset for the perceptron to train.
+     *
+     * @param minLabel first label
+     * @param maxLabel last label
+     * @param startIndex the first index to read in the reader, to avoid duplicates
+     *
+     * @param data the images the function will fill
+     * @param dataDim the size of these images
+     * @param refs the labels of the image the function will fill
+     *
+     *
+     * @param db the reader used to fill data & refs
+     */
     public static int dataGenerator(int minLabel, int maxLabel, int startIndex, float [][] data, int dataDim,
                                     int [] refs, MnistReader db){
         int imageIndex = startIndex;
@@ -237,6 +234,5 @@ public class ImageOnlinePerceptron {
                 50,0.05f);
         genPerceptronPlusCurves(10,21,500,100 ,"tenToTwentyOne",
                 50,0.05f);
-
     }
 }

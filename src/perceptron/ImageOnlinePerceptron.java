@@ -15,9 +15,9 @@ public class ImageOnlinePerceptron {
 
     /* Parametres */
     // Na exemples pour l'ensemble d'apprentissage
-    public static final int Na = 500;
+    public static int Na = 500;
     // Nv exemples pour l'ensemble d'évaluation
-    public static final int Nv = 1000;
+    public static int Nv = 1000;
     //Nt exemple pour l'ensemble de test
     public static final int Nt = 1000;
     // Nombre d'epoque max
@@ -256,24 +256,111 @@ public class ImageOnlinePerceptron {
     }
 
 
+    public static PerceptronMulti genPerceptronPlusconfMat(int minLabel,int maxLabel, int Na, int Nv,
+                                                          String filePrefix,int stagesNumber, float eta){
+        imageIndex = 0;
+        classe = maxLabel - minLabel + 1;
+        System.out.println("# Load the database for " + filePrefix + " !");
+        MnistReader db = new MnistReader(labelDB, imageDB);
+        int Dim = (db.getImage(1).length * db.getImage(1)[0].length)+1;
+
+        float[][] trainData = new float[Na][Dim];
+
+        int [] refs= new int[Na];
 
 
-    public static void main(String[] args) throws IOException {
+        dataGenerator(minLabel,maxLabel,trainData,Dim,refs,db);
 
+        System.out.println("# Built train for "+filePrefix + ".");
+
+        System.out.println("# Load validation for digits ");
+
+        float[][] valData = new float [Nv][Dim];
+        int [] refsVal = new int[Nv];
+
+        dataGenerator(minLabel,maxLabel,valData,Dim,refsVal,db);
+
+        System.out.println("# Built validation for "+filePrefix+".");
+
+        PerceptronMulti perceptron = new PerceptronMulti(Dim,classe);
+
+        perceptron.learnWithErrorsCostsArray(trainData, refs, valData, refsVal, eta, EPOCHMAX);
+        System.out.println("# Perceptron done.");
+
+        System.out.println(perceptron.stringConfusionMatrix(valData,refsVal));
+
+        System.out.println("# Computation done" + filePrefix + ".");
+        return perceptron;
+    }
+
+
+    public static void bestCosts(){
         for (int Na = 1000; Na <= 10000; Na += 100) {
             genPerceptronPlusCurves(10, 21, Na, 1000, "tenToTwentyOne" + Na,
-                    100, 0.001f);
+                    150, 0.005f);
 
         }
 
         try {
             FileWriter fw = new FileWriter("bestCostRegardingNa.d");
             for (int Na = 1000; Na <= 10000; Na += 100) {
-                fw.write("" + getBestCost("tenToTwentyOne"+Na+"ValidationCosts.d") + "," + Na + "\n");
+                fw.write("" + Na + " " + getBestCost("tenToTwentyOne"+Na+"ValidationCosts.d") + "\n");
             }
             fw.close();
         } catch (IOException e) {
             e.printStackTrace();
         }
+    }
+
+    public static PerceptronMulti genPerceptronPlusMoyClasses(int minLabel,int maxLabel, int Na, int Nv,
+                                                          String filePrefix,int stagesNumber, float eta){
+        imageIndex = 0;
+        classe = maxLabel - minLabel + 1;
+        System.out.println("# Load the database for " + filePrefix + " !");
+        MnistReader db = new MnistReader(labelDB, imageDB);
+        int Dim = (db.getImage(1).length * db.getImage(1)[0].length)+1;
+
+        float[][] trainData = new float[Na][Dim];
+
+        int [] refs= new int[Na];
+
+
+        dataGenerator(minLabel,maxLabel,trainData,Dim,refs,db);
+
+        System.out.println("# Built train for "+filePrefix + ".");
+
+        System.out.println("# Load validation for digits ");
+
+        float[][] valData = new float [Nv][Dim];
+        int [] refsVal = new int[Nv];
+
+        dataGenerator(minLabel,maxLabel,valData,Dim,refsVal,db);
+
+        System.out.println("# Built validation for "+filePrefix+".");
+
+        PerceptronMulti perceptron = new PerceptronMulti(Dim,classe);
+
+        perceptron.learnWithErrorsCostsArray(trainData, refs, valData, refsVal, eta, EPOCHMAX);
+        float probaMoy[]  = new float[Dim];
+        float probaNow[]  = new float[Dim];
+        for(int validationIndex = 0; validationIndex < Nv; validationIndex += 1) {
+            probaNow = perceptron.probaForPoint(valData[validationIndex]);
+            for (int j = 0; j < classe; j+= 1){
+                probaMoy[j] += probaNow[j];
+            }
+        }
+        System.out.print(probaMoy[0] / (float) Nv);
+        for (int j = 1; j < classe; j+= 1){
+            System.out.print(","+probaMoy[j] / (float) Nv);
+        }
+        System.out.println();
+
+        System.out.println("# Computation done" + filePrefix + ".");
+        return perceptron;
+    }
+
+
+    public static void main(String[] args) throws IOException {
+        genPerceptronPlusMoyClasses(10,21,Na,Nv,"",50,0.003f);
     }
 }

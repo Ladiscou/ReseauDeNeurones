@@ -16,7 +16,7 @@ public class ImageOnlinePerceptron {
 
     /* Parametres */
     // Na exemples pour l'ensemble d'apprentissage
-    public static final int Na = 500;
+    public static final int Na = 6000;
     // Nv exemples pour l'ensemble d'évaluation
     public static final int Nv = 1000;
     //Nt exemple pour l'ensemble de test
@@ -113,6 +113,24 @@ public class ImageOnlinePerceptron {
         }
     }
 
+    /**
+     * fonction cree pour la question avec Nt ecris dans un fichier  deux colone representant un tableau de x et un de y
+     * @param fileNames
+     * @param data
+     * @param eta
+     */
+    private static void dataFilesWritertest(String fileNames,  float data[], float eta[]) {
+        try {
+            FileWriter fw = new FileWriter(fileNames + ".d");
+            for (int i = 0; i < data.length; i++) {
+                fw.write("" + eta[i] + "  " + data[i] + 0 + "\n");
+            }
+            fw.close();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+
     private static void gnuplotFileWriter(String plotName,String[] fileNames,float eta){
         try {
             FileWriter fw = new FileWriter(plotName + ".gnu");
@@ -130,6 +148,23 @@ public class ImageOnlinePerceptron {
             e.printStackTrace();
         }
     }
+
+    private static void gnuplotFileWritertest(String plotName, String fileName){
+        try {
+            FileWriter fw = new FileWriter(plotName + ".gnu");
+            fw.write("set terminal svg size 2000,1000 \nset output 'histogram");
+            fw.write("" + plotName + "" + classe);
+            fw.write("Multi.svg'\nset title \"Na = " + Na + " Nv = " + Nv + "\" \n");
+            fw.write("set grid\nset style data linespoints\nplot");
+            fw.write("'"+fileName + ".d',");
+            fw.close();
+        }
+        catch(IOException e){
+            e.printStackTrace();
+        }
+
+    }
+
     private static String tabToString(int [] tab){
         String repTab = "[";
         for (int i =0; i < tab.length-1; i +=1) {
@@ -139,7 +174,15 @@ public class ImageOnlinePerceptron {
         return repTab;
     }
 
-
+    /**
+     * fonction qui initialise un tableau de data dans la base de donnée actuel
+     * @param minLabel
+     * @param maxLabel
+     * @param data
+     * @param dataDim
+     * @param refs
+     * @param db
+     */
     public static void dataGenerator(int minLabel, int maxLabel, float [][] data, int dataDim,
                                     int [] refs, MnistReader db){
         int length = db.getTotalImages();
@@ -228,20 +271,143 @@ public class ImageOnlinePerceptron {
         return perceptron;
     }
 
+    public static PerceptronMulti genPerceptronPlusCurvesPlusClassement(int minLabel,int maxLabel, int Na, int Nv,
+                                                          String filePrefix,int stagesNumber, float eta) {
+        imageIndex = 0;
+        classe = maxLabel - minLabel + 1;
+        System.out.println("# Load the database for " + filePrefix + " !");
+        MnistReader db = new MnistReader(labelDB, imageDB);
+        int Dim = (db.getImage(1).length * db.getImage(1)[0].length) + 1;
+
+        float[][] trainData = new float[Na][Dim];
+
+        int[] refs = new int[Na];
+
+
+        dataGenerator(minLabel, maxLabel, trainData, Dim, refs, db);
+
+        System.out.println("# Built train for " + filePrefix + ".");
+
+        System.out.println("# Load validation for digits ");
+
+        float[][] valData = new float[Nv][Dim];
+        int[] refsVal = new int[Nv];
+
+        dataGenerator(minLabel, maxLabel, valData, Dim, refsVal, db);
+
+        System.out.println("# Built validation for " + filePrefix + ".");
+
+        PerceptronMulti perceptron = new PerceptronMulti(Dim, classe);
+
+        float[][] errorsCurvePlots = perceptron.learnWithErrorsCostsArray(trainData, refs, valData, refsVal, eta, EPOCHMAX);
+        System.out.println("# Perceptron done.");
+        System.out.println("les 5 biens classées sont: ");
+        int [] five = perceptron.FiveBienClassee(valData, refsVal);
+        for(int i = 0; i < 5; i++) {
+            int point = perceptron.FiveBienClassee(valData, refsVal)[i];
+            System.out.print(point + " sa proba  pour" + refsVal[point] + "est: ");
+            float[] proba = perceptron.probaForPoint(valData[point]);
+            System.out.println(proba[refsVal[point]]);
+        }
+        System.out.println("les mal classés sont:");
+        for(int i = 0; i < 5; i ++){
+            int point = perceptron.LesPlusLoins(valData, refsVal, i)[0];
+            System.out.print(point + " sa proba est: ");
+            float [] proba = perceptron.probaForPoint(valData[point]);
+            System.out.print(proba[refsVal[point]]);
+            System.out.println(" estimer pour " + perceptron.computeClass(valData[point]));
+
+        }
+
+
+        System.out.println("Validation accuracy : " + 100.f * (1.f - (float) (errorsCurvePlots[EPOCHMAX - 1][0]) / Nv) +
+                "%, Training accuracy : " + 100.f * (1.f - (float) errorsCurvePlots[EPOCHMAX - 1][1] / Na) + '%');
+
+        String[] fileNames = new String[4];
+        fileNames[0] = filePrefix + "ValidationErrors";
+        fileNames[1] = filePrefix + "TrainingErrors";
+
+        fileNames[2] = filePrefix + "ValidationCosts";
+        fileNames[3] = filePrefix + "TrainingCosts";
+
+        dataFilesWriter(fileNames, errorsCurvePlots);
+
+        String[] errorsNames = new String[2];
+        errorsNames[0] = fileNames[0];
+        errorsNames[1] = fileNames[1];
+
+        String[] costsNames = new String[2];
+        costsNames[0] = fileNames[2];
+        costsNames[1] = fileNames[3];
+
+
+        gnuplotFileWriter(filePrefix + "Errors", errorsNames, eta);
+
+        gnuplotFileWriter(filePrefix + "Costs", costsNames, eta);
+        System.out.println("# Computation done" + filePrefix + ".");
+        return perceptron;
+    }
+
+    public static float minTableau(float data[]){
+        float min = data[0];
+        for(int i = 1; i < data.length; i++){
+            if (data[i] < min){
+                min = data[i];
+            }
+        }
+        return min;
+    }
 
 
 
     public static void main(String[] args) {
-        genPerceptronPlusCurves(10,21,500,100 ,"tenToTwentyOne",
-                50,0.001f);
-        genPerceptronPlusCurves(10,21,500,100 ,"tenToTwentyOne",
-                50,0.005f);
-        genPerceptronPlusCurves(10,21,500,100 ,"tenToTwentyOne",
-                50,0.01f);
-        genPerceptronPlusCurves(10,21,500,100 ,"tenToTwentyOne",
-                50,0.05f);
-        genPerceptronPlusCurves(10,21,500,100 ,"tenToTwentyOne",
-                50,0.05f);
+        /*  //code pour generer it perceptron avec eta allant de 0.001 a 0.001 * it
+        int it = 100;
+        float eta = 0.001f;
+        float [] etas = new float[it];
+        float [] Nverror = new float[it];
+        int maxLabel = 21;
+        int minLabel = 10;
+        MnistReader db = new MnistReader(labelDB, imageDB);
+        int Dim = (db.getImage(1).length * db.getImage(1)[0].length)+1;
+
+        for(int i = 0; i < it; i++) {
+            imageIndex = 0;
+            classe = maxLabel - minLabel + 1;
+            float[][] trainData = new float[Na][Dim];
+            int[] refs = new int[Na];
+            dataGenerator(minLabel, maxLabel, trainData, Dim, refs, db);
+            float[][] valData = new float[Nv][Dim];
+            int[] refsVal = new int[Nv];
+            dataGenerator(minLabel, maxLabel, valData, Dim, refsVal, db);
+            PerceptronMulti perceptron = new PerceptronMulti(Dim,classe);
+            float[][] errors = perceptron.learnWithErrorsCostsArray(trainData, refs, valData, refsVal, eta, EPOCHMAX);
+            float [] lesErreur = new float[errors.length]; // ici on recupere le nombre d'erreur sur Nv
+            for(int j = 0; j < errors.length; j ++){
+                lesErreur[j] = errors[j][0];
+            }
+            etas[i] = eta;
+            Nverror[i] = minTableau(lesErreur);
+            eta += 0.001f;
+        }
+
+        System.out.println(etas[5]);
+        System.out.println(Nverror[2]);
+        dataFilesWritertest("test", Nverror, etas); // fonction qui genere le .d
+        gnuplotFileWritertest("Nv_en_fonction_de_eta", "test"); // fonction qui genere le .gnu
+
+         //ici on initialise Nt et teste avec le perceptron adapté le nombre d'erreur obtenue
+        PerceptronMulti tavu = genPerceptronPlusCurves(10, 21, 10000, 1000, "tenToTwentyOne", EPOCHMAX, 0.003f);
+        MnistReader db = new MnistReader(labelDB, imageDB);
+        int Dim = (db.getImage(1).length * db.getImage(1)[0].length)+1;
+        float [][] testData = new float[Nt][Dim];
+        int [] refs= new int[Nt];
+        dataGenerator(10 , 21, testData, Dim, refs, db);
+        int erreurT = tavu.errorsDataSet(testData,refs);
+        System.out.println(erreurT);
+
+         */
+        PerceptronMulti perceptron = genPerceptronPlusCurvesPlusClassement(10, 21, 6000, 1000, "tenToTwentyOne", EPOCHMAX, 0.003f);
 
     }
 }

@@ -435,7 +435,19 @@ public class PerceptronMulti {
 		return res;
 	}
 
-
+	public float [] stickerToData(float [] sticker){
+		float[] point = new float[m_pointDim];
+		float totalData = 0;
+		for (int pixel = 0; pixel < m_pointDim; pixel += 1){
+			for (int perceptronIndex = 0; perceptronIndex < m_stickersDim; perceptronIndex+= 1){
+				point[pixel] += sticker[perceptronIndex] * m_perceptronWeightsArray[perceptronIndex][pixel];
+				totalData += sticker[perceptronIndex];
+			}
+			point[pixel] /= totalData;
+			totalData = 0;
+		}
+		return point;
+	}
 
 	
 	
@@ -458,7 +470,9 @@ public class PerceptronMulti {
 		System.out.println("class : "+ tabToString(stickerPoint));
 		System.out.println("proba classes : " + tabToString(proba));
 		System.out.println(multPerceptron.computeClass(point));
-
+		float [] sticker = new float [3];
+		sticker[2] = 1;
+		System.out.println(tabToString(multPerceptron.stickerToData(sticker)));
 
 	}
 

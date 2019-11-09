@@ -76,6 +76,25 @@ public class ImageOnlinePerceptron {
             return uniDim;
     }
 
+    public static int[][] convertPoint(float[] point, int sizeX, int sizeY,float seuil){
+        int [][] image = new int[sizeY][sizeX];
+        for (int y = 0; y < sizeY; y += 1){
+            for( int x = 0; x < sizeX; x += 1){
+                image[y][x] = point[1 + y * sizeX + x] >= seuil ? 1 : 0;
+            }
+        }
+        return image;
+    }
+
+    public static void displayImage(int[][] image){
+        for (int y = image.length-1; y >= 0; y -= 1){
+            for (int x = 0; x <image[y].length; x+=1){
+                System.out.print(image[y][x] >= 1 ? '#' : '_');
+            }
+            System.out.print('\n');
+        }
+    }
+
     /*
     *  InitialiseW :
     *      sizeW : la taille du vecteur de poids
@@ -358,9 +377,54 @@ public class ImageOnlinePerceptron {
         System.out.println("# Computation done" + filePrefix + ".");
         return perceptron;
     }
+    public static String tabToString(float [] tab){
+        String repTab = "[";
+        for (int i =0; i < tab.length-1; i +=1) {
+            repTab += "" + tab[i] +",";
+        }
+        repTab += "" + tab[ tab.length-1] + "]";
+        return repTab;
+    }
 
 
     public static void main(String[] args) throws IOException {
-        genPerceptronPlusMoyClasses(10,21,Na,Nv,"",50,0.003f);
+        Na = 12000;
+        Nv = 1;
+
+        int minLabel = 10;
+        int maxLabel = 35;
+        String filePrefix = "hey";
+        imageIndex = 0;
+        classe = maxLabel - minLabel + 1;
+        System.out.println("# Load the database for " + filePrefix + " !");
+        MnistReader db = new MnistReader(labelDB, imageDB);
+        int Dim = (db.getImage(1).length * db.getImage(1)[0].length)+1;
+
+        float[][] trainData = new float[Na][Dim];
+
+        int [] refs= new int[Na];
+
+
+        dataGenerator(minLabel,maxLabel,trainData,Dim,refs,db);
+
+        System.out.println("# Built train for "+filePrefix + ".");
+
+        System.out.println("# Load validation for digits ");
+
+        float[][] valData = new float [Nv][Dim];
+        int [] refsVal = new int[Nv];
+
+        dataGenerator(minLabel,maxLabel,valData,Dim,refsVal,db);
+
+        System.out.println("# Built validation for "+filePrefix+".");
+
+        PerceptronMulti perceptron = new PerceptronMulti(Dim,classe);
+
+        perceptron.learnWithErrorsCostsArray(trainData, refs, valData, refsVal, .003f, 200);
+        displayImage(BinariserImage(db.getImage(1),50));
+        int size = db.getImage(1).length;
+        displayImage(convertPoint(ConvertImage(BinariserImage(db.getImage(1),50)),size, size,1));
+        displayImage(convertPoint(perceptron.stickerToData(perceptron.probaForPoint(ConvertImage(BinariserImage(db.getImage(1),50)))),size,size,0.001f));
+        System.out.println(tabToString(perceptron.stickerToData(perceptron.probaForPoint(ConvertImage(BinariserImage(db.getImage(1),50))))));
     }
 }

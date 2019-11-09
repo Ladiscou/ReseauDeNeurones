@@ -32,7 +32,7 @@ public class ImageOnlinePerceptron {
     // Générateur de nombres aléatoires
     public static int seed = 1234;
     public static Random GenRdm = new Random(seed);
-
+    //la taille des image dans le minstreader sont de 28 par 28
 
     /*
     *  BinariserImage :
@@ -75,6 +75,18 @@ public class ImageOnlinePerceptron {
             	}
             }
             return uniDim;
+    }
+
+    public static int [][] RollBack(float [] image, int dim){
+        int [][] ima = new int[dim][dim];
+        int index = 0;
+        for(int i = 0; i < dim; i ++){
+            for(int j = 0; j < dim; j++){
+                ima[i][j] = (int) image[index];
+                index++;
+            }
+        }
+        return ima;
     }
 
     /*
@@ -308,6 +320,13 @@ public class ImageOnlinePerceptron {
             System.out.print(point + " sa proba  pour" + refsVal[point] + "est: ");
             float[] proba = perceptron.probaForPoint(valData[point]);
             System.out.println(proba[refsVal[point]]);
+            int [][] illus = RollBack(valData[point], 28); // code pour afficher l'image
+            for(int j = 0; j < illus.length; j++){
+                for(int u = 0; u < illus.length; u++){
+                    System.out.print(" " + illus[j][u]);
+                }
+                System.out.println("");
+            }
         }
         System.out.println("les mal classés sont:");
         for(int i = 0; i < 5; i ++){
@@ -316,8 +335,16 @@ public class ImageOnlinePerceptron {
             float [] proba = perceptron.probaForPoint(valData[point]);
             System.out.print(proba[refsVal[point]]);
             System.out.println(" estimer pour " + perceptron.computeClass(valData[point]));
+            int [][] illus = RollBack(valData[point], 28); // code pour afficher l'image
+            for(int j = 0; j < illus.length; j++){
+                for(int u = 0; u < illus.length; u++){
+                    System.out.print(" " + illus[j][u]);
+                }
+                System.out.println("");
+            }
 
         }
+
 
 
         System.out.println("Validation accuracy : " + 100.f * (1.f - (float) (errorsCurvePlots[EPOCHMAX - 1][0]) / Nv) +

@@ -6,6 +6,7 @@ import javax.imageio.ImageIO;
 import java.awt.image.BufferedImage;
 import java.io.*;
 import java.util.Random;
+import java.util.Vector;
 
 public class ImageOnlinePerceptron {
 
@@ -435,9 +436,44 @@ public class ImageOnlinePerceptron {
         }
     }
 
+    public static void moyImageForAllClasses(float data[][],int refs [], int classSize, PerceptronMulti perceptron){
+        Vector<BufferedImage> newImages =new Vector<BufferedImage>(0);
+
+        float[][] pixelf = new float [classSize][data[0].length];
+        int [] pixelsNs = new int[classSize];
+        int pointClass = 0;
+        for (int pointIndex =0; pointIndex < data.length; pointIndex+= 1){
+            if (perceptron.computeClass(data[pointIndex]) != refs[pointIndex]){
+                continue;
+            }
+            pointClass = refs[pointIndex];
+            pixelsNs[pointClass]+=1;
+            for (int pixelIndex = 0; pixelIndex < data[pointIndex].length; pixelIndex +=1){
+                pixelf [pointClass][pixelIndex] += data[pointIndex][pixelIndex];
+            }
+        }
+        int light;
+        int pixel;
+        for (pointClass = 0; pointClass < classSize; pointClass += 1){
+            BufferedImage imageNowForClass = new BufferedImage (28, 28, BufferedImage.TYPE_INT_RGB);
+            for (int i = 0; i < 28; i++) {
+                for (int j = 0; j < 28; j++) {
+                    light = Math.round(255*(( pixelf[pointClass][1+i*28 + j])/(pixelsNs[pointClass])));
+                    pixel = light << 16 | light << 8 | light;
+                    imageNowForClass.setRGB(i,j,pixel);
+                }
+            }
+            try {
+                ImageIO.write(imageNowForClass, "png",new File ("moyClass"+pointClass+".png"));
+            } catch (IOException e1) {
+
+            }
+        }
+    }
+
     public static void main(String[] args) throws IOException {
-        Na = 15000;
-        Nv = 1;
+        Na = 6000;
+        Nv = 1000;
 
         int minLabel = 10;
         int maxLabel = 35;
@@ -468,10 +504,10 @@ public class ImageOnlinePerceptron {
 
         PerceptronMulti perceptron = new PerceptronMulti(Dim,classe);
 
-        perceptron.learn(trainData, refs, .003f, 140);
+        perceptron.learn(trainData, refs, .003f, 50);
         displayImage(BinariserImage(db.getImage(1),50));
         int size = db.getImage(1).length;
-
+        moyImageForAllClasses(valData,refsVal,maxLabel - minLabel +1,perceptron);
 
         displayImage(convertPoint(ConvertImage(BinariserImage(db.getImage(1),5)),size, size,1));
         for (int i = 0; i < perceptron.m_stickersDim; i += 1){

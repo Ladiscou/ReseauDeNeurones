@@ -2,6 +2,8 @@ package perceptron;
 
 import mnisttools.MnistReader;
 
+import javax.imageio.ImageIO;
+import java.awt.image.BufferedImage;
 import java.io.*;
 import java.util.Random;
 
@@ -85,6 +87,17 @@ public class ImageOnlinePerceptron {
         }
         return image;
     }
+
+    public static float[][] convertPointf(float[] point, int sizeX, int sizeY){
+        float [][] image = new float[sizeY][sizeX];
+        for (int y = 0; y < sizeY; y += 1){
+            for( int x = 0; x < sizeX; x += 1){
+                image[y][x] = point[1 + y * sizeX + x];
+            }
+        }
+        return image;
+    }
+
 
     public static void displayImage(int[][] image){
         for (int y = image.length-1; y >= 0; y -= 1){
@@ -386,9 +399,44 @@ public class ImageOnlinePerceptron {
         return repTab;
     }
 
+    public static void  imageForClass(PerceptronMulti perceptron,int size, int classImage, String imageName){
+        BufferedImage newImage = new BufferedImage(size, size, BufferedImage.TYPE_INT_RGB);
+        float[][] pixelf = convertPointf(perceptron.stickerToData(perceptron.intToSticker(classImage)),size,size);
+
+
+        float max = pixelf[0][0];
+        float min = max;
+        for (int i = 0; i < size; i++) {
+            for (int j = 0; j < size; j++) {
+                if(max < pixelf[i][j]){
+                    max = pixelf[i][j];
+                }
+                else {
+                    if (min > pixelf[i][j]){
+                        min = pixelf[i][j];
+                    }
+                }
+            }
+        }
+        int light;
+        int pixel;
+        for (int i = 0; i < size; i++) {
+            for (int j = 0; j < size; j++) {
+                light = Math.round(255*(( pixelf[i][j]-min)/(max-min)));
+                pixel = light << 16 | light << 8 | light;
+                newImage.setRGB(i,j,pixel);
+            }
+        }
+        File outputFile = new File(imageName+classImage+".png");
+        try {
+            ImageIO.write(newImage, "png", outputFile);
+        } catch (IOException e1) {
+
+        }
+    }
 
     public static void main(String[] args) throws IOException {
-        Na = 12000;
+        Na = 15000;
         Nv = 1;
 
         int minLabel = 10;
@@ -420,11 +468,15 @@ public class ImageOnlinePerceptron {
 
         PerceptronMulti perceptron = new PerceptronMulti(Dim,classe);
 
-        perceptron.learnWithErrorsCostsArray(trainData, refs, valData, refsVal, .003f, 200);
+        perceptron.learn(trainData, refs, .003f, 140);
         displayImage(BinariserImage(db.getImage(1),50));
         int size = db.getImage(1).length;
-        displayImage(convertPoint(ConvertImage(BinariserImage(db.getImage(1),50)),size, size,1));
-        displayImage(convertPoint(perceptron.stickerToData(perceptron.probaForPoint(ConvertImage(BinariserImage(db.getImage(1),50)))),size,size,0.001f));
-        System.out.println(tabToString(perceptron.stickerToData(perceptron.probaForPoint(ConvertImage(BinariserImage(db.getImage(1),50))))));
+
+
+        displayImage(convertPoint(ConvertImage(BinariserImage(db.getImage(1),5)),size, size,1));
+        for (int i = 0; i < perceptron.m_stickersDim; i += 1){
+            imageForClass(perceptron,28,i,"letterClass");
+        }
+
     }
 }

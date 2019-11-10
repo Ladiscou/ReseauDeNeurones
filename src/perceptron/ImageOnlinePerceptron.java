@@ -471,10 +471,8 @@ public class ImageOnlinePerceptron {
         }
     }
 
-    public static void main(String[] args) throws IOException {
-        Na = 6000;
-        Nv = 1000;
 
+    public static void perceptronImageDisplaying(){
         int minLabel = 10;
         int maxLabel = 35;
         String filePrefix = "hey";
@@ -504,15 +502,18 @@ public class ImageOnlinePerceptron {
 
         PerceptronMulti perceptron = new PerceptronMulti(Dim,classe);
 
-        perceptron.learn(trainData, refs, .003f, 50);
-        displayImage(BinariserImage(db.getImage(1),50));
-        int size = db.getImage(1).length;
+        perceptron.learn(trainData, refs, .003f, 110);
         moyImageForAllClasses(valData,refsVal,maxLabel - minLabel +1,perceptron);
 
-        displayImage(convertPoint(ConvertImage(BinariserImage(db.getImage(1),5)),size, size,1));
         for (int i = 0; i < perceptron.m_stickersDim; i += 1){
             imageForClass(perceptron,28,i,"letterClass");
         }
+        System.out.println("# Computation done.");
+    }
+
+    public static void main(String[] args) throws IOException {
+        Na = 6000;
+        Nv = 1000;
 
     }
 }

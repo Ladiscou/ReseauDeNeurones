@@ -314,7 +314,7 @@ public class ImageOnlinePerceptron {
         float[][] errorsCurvePlots = perceptron.learnWithErrorsCostsArray(trainData, refs, valData, refsVal, eta, EPOCHMAX);
         System.out.println("# Perceptron done.");
         System.out.println("les 5 biens classées sont: ");
-        int [] five = perceptron.FiveBienClassee(valData, refsVal);
+        int [] five = perceptron.FiveBienClassee(valData, refsVal); //reponse a la question 5 bien classées
         for(int i = 0; i < 5; i++) {
             int point = perceptron.FiveBienClassee(valData, refsVal)[i];
             System.out.print(point + " sa proba  pour" + refsVal[point] + "est: ");
@@ -328,7 +328,7 @@ public class ImageOnlinePerceptron {
                 System.out.println("");
             }
         }
-        System.out.println("les mal classés sont:");
+        System.out.println("les mal classés sont:"); //reponse a la question 5 mal classées
         for(int i = 0; i < 5; i ++){
             int point = perceptron.LesPlusLoins(valData, refsVal, i)[0];
             System.out.print(point + " sa proba est: ");

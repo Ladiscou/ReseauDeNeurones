@@ -435,6 +435,6 @@ public class ImageOnlinePerceptron {
 
          */
         PerceptronMulti perceptron = genPerceptronPlusCurvesPlusClassement(10, 21, 6000, 1000, "tenToTwentyOne", EPOCHMAX, 0.003f);
-
+        //l'appel de la fonction va permettre d'illustrer les reponse au question 5 bien classées et 5 mal classées
     }
 }
